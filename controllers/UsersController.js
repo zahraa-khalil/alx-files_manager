@@ -1,9 +1,10 @@
 /* eslint-disable */
-import dbClient from '../utils/db';
 import sha1 from 'sha1';
+import { ObjectId } from 'mongodb';
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 class UsersController {
-
   static async postNew (request, response) {
     const { email, password } = request.body;
     if (!email) {
@@ -34,7 +35,6 @@ class UsersController {
     }
   }
 
-
   static async getMe (request, response) {
     try {
       const userToken = request.header('X-Token');
@@ -54,6 +54,5 @@ class UsersController {
     }
   }
 }
-
 
 export default UsersController;
