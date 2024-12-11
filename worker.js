@@ -1,45 +1,50 @@
 /* eslint-disable */
-import DBClient from './utils/db';
 
-const Bull = require('bull');
-const { ObjectId } = require('mongodb');
+const Queue = require('bull');
 const imageThumbnail = require('image-thumbnail');
-const fs = require('fs');
-const fileQueue = new Bull('fileQueue');
-const userQueue = new Bull('userQueue');
+const dbClient = require('./utils/db');
 
-const createImageThumbnail = async (path, options) => {
-  try {
-    const thumbnail = await imageThumbnail(path, options);
-    const pathNail = `${path}_${options.width}`;
-
-    await fs.writeFileSync(pathNail, thumbnail);
-  } catch (error) {
-    console.log(error);
-  }
-};
+const fileQueue = new Queue('fileQueue');
 
 fileQueue.process(async (job) => {
-  const { fileId } = job.data;
-  if (!fileId) throw Error('Missing fileId');
+  const { userId, fileId } = job.data;
 
-  const { userId } = job.data;
-  if (!userId) throw Error('Missing userId');
+  if (!fileId) {
+    throw new Error('Missing fileId');
+  }
+  if (!userId) {
+    throw new Error('Missing userId');
+  }
 
-  const fileDocument = await DBClient.db.collection('files').findOne({ _id: ObjectId(fileId), userId: ObjectId(userId) });
-  if (!fileDocument) throw Error('File not found');
+  const fileDocument = await dbClient.db.collection('files').findOne({ _id: fileId, userId });
+  if (!fileDocument) {
+    throw new Error('File not found');
+  }
 
-  createImageThumbnail(fileDocument.localPath, { width: 500 });
-  createImageThumbnail(fileDocument.localPath, { width: 250 });
-  createImageThumbnail(fileDocument.localPath, { width: 100 });
+  const options = { width: 500 };
+  const thumbnail500 = await imageThumbnail(fileDocument.localPath, options);
+
+  return { thumbnail500 /* other thumbnails */ };
 });
+
+// User Queue
+const userQueue = new Queue('userQueue');
 
 userQueue.process(async (job) => {
   const { userId } = job.data;
-  if (!userId) throw Error('Missing userId');
 
-  const userDocument = await DBClient.db.collection('users').findOne({ _id: ObjectId(userId) });
-  if (!userDocument) throw Error('User not found');
+  if (!userId) {
+    throw new Error('Missing userId');
+  }
 
-  console.log(`Welcome ${userDocument.email}`);
+  const userDocument = await dbClient.db.collection('users').findOne({ _id: userId });
+  if (!userDocument) {
+    throw new Error('User not found');
+  }
+
+  console.log(`Welcome ${userDocument.email}!`);
+
+  return { userId };
 });
+
+module.exports = { fileQueue, userQueue };
