@@ -1,11 +1,11 @@
-
+/* eslint-disable */
 import Queue from 'bull';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { mkdir, writeFile, readFileSync } from 'fs';
 import mime from 'mime-types';
 import dbClient from '../utils/db';
-import { getIdAndKey, isValidUser } from '../utils/users';
+// import { getIdAndKey, isValidUser } from '../utils/users';
 
 class FilesController {
   static async postUpload (request, response) {
@@ -89,7 +89,144 @@ class FilesController {
     });
   }
 
+  // static async getShow (request, response) {
+  //   const { userId } = await getIdAndKey(request);
+  //   if (!isValidUser(userId)) return response.status(401).send({ error: 'Unauthorized' });
 
+  //   const user = await dbClient.users.findOne({ _id: ObjectId(userId) });
+  //   if (!user) return response.status(401).send({ error: 'Unauthorized' });
+
+  //   const fileId = request.params.id || '';
+  //   const file = await dbClient.files.findOne({ _id: ObjectId(fileId), userId: user._id });
+  //   if (!file) return response.status(404).send({ error: 'Not found' });
+
+  //   return response.status(200).send({
+  //     id: file._id,
+  //     userId: file.userId,
+  //     name: file.name,
+  //     type: file.type,
+  //     isPublic: file.isPublic,
+  //     parentId: file.parentId
+  //   });
+  // }
+
+  // static async getIndex (request, response) {
+  //   const { userId } = await getIdAndKey(request);
+  //   if (!isValidUser(userId)) return response.status(401).send({ error: 'Unauthorized' });
+
+  //   const user = await dbClient.users.findOne({ _id: ObjectId(userId) });
+  //   if (!user) return response.status(401).send({ error: 'Unauthorized' });
+
+  //   let parentId = request.query.parentId || 0;
+  //   if (parentId === '0') parentId = 0;
+  //   if (parentId !== 0) {
+  //     if (!isValidUser(parentId)) return response.status(401).send({ error: 'Unauthorized' });
+
+  //     parentId = ObjectId(parentId);
+
+  //     const folder = await dbClient.files.findOne({ _id: ObjectId(parentId) });
+  //     if (!folder || folder.type !== 'folder') return response.status(200).send([]);
+  //   }
+
+  //   const page = request.query.page || 0;
+
+  //   const agg = { $and: [{ parentId }] };
+  //   let aggData = [{ $match: agg }, { $skip: page * 20 }, { $limit: 20 }];
+  //   if (parentId === 0) aggData = [{ $skip: page * 20 }, { $limit: 20 }];
+
+  //   const pageFiles = await dbClient.files.aggregate(aggData);
+  //   const files = [];
+
+  //   await pageFiles.forEach((file) => {
+  //     const fileObj = {
+  //       id: file._id,
+  //       userId: file.userId,
+  //       name: file.name,
+  //       type: file.type,
+  //       isPublic: file.isPublic,
+  //       parentId: file.parentId
+  //     };
+  //     files.push(fileObj);
+  //   });
+
+  //   return response.status(200).send(files);
+  // }
+
+  // static async putPublish (request, response) {
+  //   const { userId } = await getIdAndKey(request);
+  //   if (!isValidUser(userId)) return response.status(401).send({ error: 'Unauthorized' });
+
+  //   const user = await dbClient.users.findOne({ _id: ObjectId(userId) });
+  //   if (!user) return response.status(401).send({ error: 'Unauthorized' });
+
+  //   const fileId = request.params.id || '';
+
+  //   let file = await dbClient.files.findOne({ _id: ObjectId(fileId), userId: user._id });
+  //   if (!file) return response.status(404).send({ error: 'Not found' });
+
+  //   await dbClient.files.updateOne({ _id: ObjectId(fileId) }, { $set: { isPublic: true } });
+  //   file = await dbClient.files.findOne({ _id: ObjectId(fileId), userId: user._id });
+
+  //   return response.status(200).send({
+  //     id: file._id,
+  //     userId: file.userId,
+  //     name: file.name,
+  //     type: file.type,
+  //     isPublic: file.isPublic,
+  //     parentId: file.parentId
+  //   });
+  // }
+
+  // static async putUnpublish (request, response) {
+  //   const { userId } = await getIdAndKey(request);
+  //   if (!isValidUser(userId)) return response.status(401).send({ error: 'Unauthorized' });
+
+  //   const user = await dbClient.users.findOne({ _id: ObjectId(userId) });
+  //   if (!user) return response.status(401).send({ error: 'Unauthorized' });
+
+  //   const fileId = request.params.id || '';
+
+  //   let file = await dbClient.files.findOne({ _id: ObjectId(fileId), userId: user._id });
+  //   if (!file) return response.status(404).send({ error: 'Not found' });
+
+  //   await dbClient.files.updateOne({ _id: ObjectId(fileId) }, { $set: { isPublic: false } });
+  //   file = await dbClient.files.findOne({ _id: ObjectId(fileId), userId: user._id });
+
+  //   return response.status(200).send({
+  //     id: file._id,
+  //     userId: file.userId,
+  //     name: file.name,
+  //     type: file.type,
+  //     isPublic: file.isPublic,
+  //     parentId: file.parentId
+  //   });
+  // }
+
+  // static async getFile (request, response) {
+  //   const fileId = request.params.id || '';
+  //   const size = request.query.size || 0;
+
+  //   const file = await dbClient.files.findOne({ _id: ObjectId(fileId) });
+  //   if (!file) return response.status(404).send({ error: 'Not found' });
+
+  //   const { isPublic, userId, type } = file;
+
+  //   const { userId: user } = await getIdAndKey(request);
+
+  //   if ((!isPublic && !user) || (user && userId.toString() !== user && !isPublic)) return response.status(404).send({ error: 'Not found' });
+  //   if (type === 'folder') return response.status(400).send({ error: 'A folder doesn\'t have content' });
+
+  //   const path = size === 0 ? file.localPath : `${file.localPath}_${size}`;
+
+  //   try {
+  //     const fileData = readFileSync(path);
+  //     const mimeType = mime.contentType(file.name);
+  //     response.setHeader('Content-Type', mimeType);
+  //     return response.status(200).send(fileData);
+  //   } catch (err) {
+  //     return response.status(404).send({ error: 'Not found' });
+  //   }
+  // }
 }
 
 export default FilesController;

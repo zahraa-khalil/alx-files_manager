@@ -13,7 +13,7 @@ router.get('/stats', AppController.getStats);
 
 // users
 router.post('/users', UsersController.postNew);
-router.get('/users/me', UserController.getMe);
+router.get('/users/me', UsersController.getMe);
 
 
 // auth
@@ -21,8 +21,10 @@ router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
 
 
-
 // files
 router.post('/files', FilesController.postUpload);
+// router.get('/files/:id', FilesController.getShow);
+// router.get('/files', FilesController.getIndex);
+
 
 export default router;
