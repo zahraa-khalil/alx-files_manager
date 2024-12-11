@@ -89,6 +89,7 @@ class FilesController {
     });
   }
 
+
   // static async getShow (request, response) {
   //   const { userId } = await getIdAndKey(request);
   //   if (!isValidUser(userId)) return response.status(401).send({ error: 'Unauthorized' });
